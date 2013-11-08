@@ -1239,6 +1239,7 @@ type CMsgClientGamesPlayed_GamePlayed struct {
 	ProcessId           *uint32 `protobuf:"varint,9,opt,name=process_id" json:"process_id,omitempty"`
 	StreamingProviderId *uint32 `protobuf:"varint,10,opt,name=streaming_provider_id" json:"streaming_provider_id,omitempty"`
 	GameFlags           *uint32 `protobuf:"varint,11,opt,name=game_flags" json:"game_flags,omitempty"`
+	OwnerId             *uint32 `protobuf:"varint,12,opt,name=owner_id" json:"owner_id,omitempty"`
 	XXX_unrecognized    []byte  `json:"-"`
 }
 
@@ -1319,6 +1320,13 @@ func (m *CMsgClientGamesPlayed_GamePlayed) GetStreamingProviderId() uint32 {
 func (m *CMsgClientGamesPlayed_GamePlayed) GetGameFlags() uint32 {
 	if m != nil && m.GameFlags != nil {
 		return *m.GameFlags
+	}
+	return 0
+}
+
+func (m *CMsgClientGamesPlayed_GamePlayed) GetOwnerId() uint32 {
+	if m != nil && m.OwnerId != nil {
+		return *m.OwnerId
 	}
 	return 0
 }
@@ -14881,8 +14889,9 @@ func (m *CMsgClientDeauthorizeDevice) GetDeauthorizationAccountId() uint32 {
 }
 
 type CMsgClientUseLocalDeviceAuthorizations struct {
-	AuthorizationAccountId []uint32 `protobuf:"varint,1,rep,name=authorization_account_id" json:"authorization_account_id,omitempty"`
-	XXX_unrecognized       []byte   `json:"-"`
+	AuthorizationAccountId []uint32                                              `protobuf:"varint,1,rep,name=authorization_account_id" json:"authorization_account_id,omitempty"`
+	DeviceTokens           []*CMsgClientUseLocalDeviceAuthorizations_DeviceToken `protobuf:"bytes,2,rep,name=device_tokens" json:"device_tokens,omitempty"`
+	XXX_unrecognized       []byte                                                `json:"-"`
 }
 
 func (m *CMsgClientUseLocalDeviceAuthorizations) Reset() {
@@ -14896,6 +14905,41 @@ func (m *CMsgClientUseLocalDeviceAuthorizations) GetAuthorizationAccountId() []u
 		return m.AuthorizationAccountId
 	}
 	return nil
+}
+
+func (m *CMsgClientUseLocalDeviceAuthorizations) GetDeviceTokens() []*CMsgClientUseLocalDeviceAuthorizations_DeviceToken {
+	if m != nil {
+		return m.DeviceTokens
+	}
+	return nil
+}
+
+type CMsgClientUseLocalDeviceAuthorizations_DeviceToken struct {
+	OwnerAccountId   *uint32 `protobuf:"varint,1,opt,name=owner_account_id" json:"owner_account_id,omitempty"`
+	TokenId          *uint64 `protobuf:"varint,2,opt,name=token_id" json:"token_id,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgClientUseLocalDeviceAuthorizations_DeviceToken) Reset() {
+	*m = CMsgClientUseLocalDeviceAuthorizations_DeviceToken{}
+}
+func (m *CMsgClientUseLocalDeviceAuthorizations_DeviceToken) String() string {
+	return proto.CompactTextString(m)
+}
+func (*CMsgClientUseLocalDeviceAuthorizations_DeviceToken) ProtoMessage() {}
+
+func (m *CMsgClientUseLocalDeviceAuthorizations_DeviceToken) GetOwnerAccountId() uint32 {
+	if m != nil && m.OwnerAccountId != nil {
+		return *m.OwnerAccountId
+	}
+	return 0
+}
+
+func (m *CMsgClientUseLocalDeviceAuthorizations_DeviceToken) GetTokenId() uint64 {
+	if m != nil && m.TokenId != nil {
+		return *m.TokenId
+	}
+	return 0
 }
 
 type CMsgClientGetAuthorizedDevices struct {
