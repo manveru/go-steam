@@ -2,8 +2,8 @@ package steam
 
 import (
 	"code.google.com/p/goprotobuf/proto"
-	. "github.com/macb/go-steam/internal"
-	. "github.com/macb/go-steam/steamid"
+	. "github.com/manveru/go-steam/internal"
+	. "github.com/manveru/go-steam/steamid"
 )
 
 // Provides access to the Steam client's part of Steam Trading, that is bootstrapping

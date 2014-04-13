@@ -2,7 +2,7 @@ package internal
 
 import (
 	"code.google.com/p/goprotobuf/proto"
-	. "github.com/macb/go-steam/steamid"
+	. "github.com/manveru/go-steam/steamid"
 	"io"
 )
 

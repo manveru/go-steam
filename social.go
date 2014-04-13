@@ -3,8 +3,8 @@ package steam
 import (
 	"bytes"
 	"code.google.com/p/goprotobuf/proto"
-	. "github.com/macb/go-steam/internal"
-	. "github.com/macb/go-steam/steamid"
+	. "github.com/manveru/go-steam/internal"
+	. "github.com/manveru/go-steam/steamid"
 	"sync"
 )
 
