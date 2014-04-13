@@ -293,7 +293,7 @@ func (f *Friend) GameAppId() uint64 {
 }
 
 type GroupsList struct {
-	mutex *sync.RWMutex
+	mutex sync.RWMutex
 
 	first *Group
 	last  *Group
