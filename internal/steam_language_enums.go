@@ -1410,13 +1410,9 @@ const (
 	EMsg_GameServerOutOfDate                                           = 6407
 	EMsg_ClientAuthorizeLocalDeviceRequest                             = 6501
 	EMsg_ClientAuthorizeLocalDevice                                    = 6502
-	EMsg_ClientDeauthorizeLocalDeviceRequest                           = 6503 // Deprecated: renamed to ClientDeauthorizeDeviceRequest
-	EMsg_ClientDeauthorizeLocalDevice                                  = 6504 // Deprecated: renamed to ClientDeauthorizeDevice
-	EMsg_ClientDeauthorizeDeviceRequest                                = 6503
-	EMsg_ClientDeauthorizeDevice                                       = 6504
+	EMsg_ClientDeauthorizeLocalDeviceRequest                           = 6503
+	EMsg_ClientDeauthorizeLocalDevice                                  = 6504
 	EMsg_ClientUseLocalDeviceAuthorizations                            = 6505
-	EMsg_ClientGetAuthorizedDevices                                    = 6506
-	EMsg_ClientGetAuthorizedDevicesResponse                            = 6507
 	EMsg_MMSBase                                                       = 6600
 	EMsg_ClientMMSCreateLobby                                          = 6601
 	EMsg_ClientMMSCreateLobbyResponse                                  = 6602
@@ -1552,7 +1548,6 @@ const (
 	EMsg_ClientUCMEnumerateUserSubscribedFilesWithUpdates              = 7378
 	EMsg_ClientUCMEnumerateUserSubscribedFilesWithUpdatesResponse      = 7379
 	EMsg_UCMPublishedFileContentUpdated                                = 7380
-	EMsg_UCMPublishedFileUpdated                                       = 7381
 	EMsg_FSBase                                                        = 7500
 	EMsg_ClientRichPresenceUpload                                      = 7501
 	EMsg_ClientRichPresenceRequest                                     = 7502
@@ -1720,11 +1715,9 @@ const (
 	EMsg_TestWorkerProcessServiceModuleCallResponse                    = 9203
 	EMsg_ClientGetEmoticonList                                         = 9330
 	EMsg_ClientEmoticonList                                            = 9331
-	EMsg_ClientSharedLibraryBase                                       = 9400
-	EMsg_ClientSharedLicensesLockStatus                                = 9403 // Deprecated
-	EMsg_ClientSharedLicensesStopPlaying                               = 9404 // Deprecated
-	EMsg_ClientSharedLibraryLockStatus                                 = 9405
-	EMsg_ClientSharedLibraryStopPlaying                                = 9406
+	EMsg_ClientSharedLicenses                                          = 9400
+	EMsg_ClientSharedLicensesLockStatus                                = 9403
+	EMsg_ClientSharedLicensesStopPlaying                               = 9404
 )
 
 func (e EMsg) String() string {
@@ -4487,10 +4480,6 @@ func (e EMsg) String() string {
 		return "EMsg_ClientDeauthorizeLocalDevice"
 	case EMsg_ClientUseLocalDeviceAuthorizations:
 		return "EMsg_ClientUseLocalDeviceAuthorizations"
-	case EMsg_ClientGetAuthorizedDevices:
-		return "EMsg_ClientGetAuthorizedDevices"
-	case EMsg_ClientGetAuthorizedDevicesResponse:
-		return "EMsg_ClientGetAuthorizedDevicesResponse"
 	case EMsg_MMSBase:
 		return "EMsg_MMSBase"
 	case EMsg_ClientMMSCreateLobby:
@@ -4761,8 +4750,6 @@ func (e EMsg) String() string {
 		return "EMsg_ClientUCMEnumerateUserSubscribedFilesWithUpdatesResponse"
 	case EMsg_UCMPublishedFileContentUpdated:
 		return "EMsg_UCMPublishedFileContentUpdated"
-	case EMsg_UCMPublishedFileUpdated:
-		return "EMsg_UCMPublishedFileUpdated"
 	case EMsg_FSBase:
 		return "EMsg_FSBase"
 	case EMsg_ClientRichPresenceUpload:
@@ -5071,16 +5058,12 @@ func (e EMsg) String() string {
 		return "EMsg_ClientGetEmoticonList"
 	case EMsg_ClientEmoticonList:
 		return "EMsg_ClientEmoticonList"
-	case EMsg_ClientSharedLibraryBase:
-		return "EMsg_ClientSharedLibraryBase"
+	case EMsg_ClientSharedLicenses:
+		return "EMsg_ClientSharedLicenses"
 	case EMsg_ClientSharedLicensesLockStatus:
 		return "EMsg_ClientSharedLicensesLockStatus"
 	case EMsg_ClientSharedLicensesStopPlaying:
 		return "EMsg_ClientSharedLicensesStopPlaying"
-	case EMsg_ClientSharedLibraryLockStatus:
-		return "EMsg_ClientSharedLibraryLockStatus"
-	case EMsg_ClientSharedLibraryStopPlaying:
-		return "EMsg_ClientSharedLibraryStopPlaying"
 	default:
 		return "INVALID"
 	}
@@ -5370,7 +5353,7 @@ const (
 	EChatEntryType_ChatMsg                         = 1
 	EChatEntryType_Typing                          = 2
 	EChatEntryType_InviteGame                      = 3
-	EChatEntryType_Emote                           = 4 // Deprecated: No longer supported by clients
+	EChatEntryType_Emote                           = 4
 	EChatEntryType_LobbyGameStart                  = 5
 	EChatEntryType_LeftConversation                = 6
 	EChatEntryType_Entered                         = 7
@@ -7370,8 +7353,7 @@ const (
 	EMarketingMessageFlags_HighPriority                                = 1
 	EMarketingMessageFlags_PlatformWindows                             = 2
 	EMarketingMessageFlags_PlatformMac                                 = 4
-	EMarketingMessageFlags_PlatformLinux                               = 8
-	EMarketingMessageFlags_PlatformRestrictions                        = EMarketingMessageFlags_PlatformWindows | EMarketingMessageFlags_PlatformMac | EMarketingMessageFlags_PlatformLinux
+	EMarketingMessageFlags_PlatformRestrictions                        = 6
 )
 
 func (e EMarketingMessageFlags) String() string {
@@ -7384,8 +7366,6 @@ func (e EMarketingMessageFlags) String() string {
 		return "EMarketingMessageFlags_PlatformWindows"
 	case EMarketingMessageFlags_PlatformMac:
 		return "EMarketingMessageFlags_PlatformMac"
-	case EMarketingMessageFlags_PlatformLinux:
-		return "EMarketingMessageFlags_PlatformLinux"
 	case EMarketingMessageFlags_PlatformRestrictions:
 		return "EMarketingMessageFlags_PlatformRestrictions"
 	default:

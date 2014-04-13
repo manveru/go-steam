@@ -2461,36 +2461,3 @@ func (d *MsgClientCreateChatResponse) Deserialize(r io.Reader) error {
 	d.SteamIdFriendChat = SteamId(t3)
 	return err
 }
-
-type MsgClientMarketingMessageUpdate2 struct {
-	MarketingMessageUpdateTime uint32
-	Count                      uint32
-}
-
-func NewMsgClientMarketingMessageUpdate2() *MsgClientMarketingMessageUpdate2 {
-	return &MsgClientMarketingMessageUpdate2{}
-}
-
-func (d *MsgClientMarketingMessageUpdate2) GetEMsg() EMsg {
-	return EMsg_ClientMarketingMessageUpdate2
-}
-
-func (d *MsgClientMarketingMessageUpdate2) Serialize(w io.Writer) error {
-	var err error
-	err = binary.Write(w, binary.LittleEndian, d.MarketingMessageUpdateTime)
-	if err != nil {
-		return err
-	}
-	err = binary.Write(w, binary.LittleEndian, d.Count)
-	return err
-}
-
-func (d *MsgClientMarketingMessageUpdate2) Deserialize(r io.Reader) error {
-	var err error
-	d.MarketingMessageUpdateTime, err = readUint32(r)
-	if err != nil {
-		return err
-	}
-	d.Count, err = readUint32(r)
-	return err
-}

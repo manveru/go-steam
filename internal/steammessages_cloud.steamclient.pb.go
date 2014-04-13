@@ -2,6 +2,26 @@
 // source: steammessages_cloud.steamclient.proto
 // DO NOT EDIT!
 
+/*
+Package steammessages_cloud_steamclient is a generated protocol buffer package.
+
+It is generated from these files:
+	steammessages_cloud.steamclient.proto
+
+It has these top-level messages:
+	CCloud_GetUploadServerInfo_Request
+	CCloud_GetUploadServerInfo_Response
+	CCloud_GetFileDetails_Request
+	CCloud_UserFile
+	CCloud_GetFileDetails_Response
+	CCloud_EnumerateUserFiles_Request
+	CCloud_EnumerateUserFiles_Response
+	CCloud_Delete_Request
+	CCloud_Delete_Response
+	CCloud_GetClientEncryptionKey_Request
+	CCloud_GetClientEncryptionKey_Response
+	CCloud_CDNReport_Notification
+*/
 package internal
 
 import proto "code.google.com/p/goprotobuf/proto"

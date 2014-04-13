@@ -5,12 +5,12 @@ It's a port of [SteamKit2](https://github.com/SteamRE/SteamKit) to Go.
 
 ## Installation
 
-    go get github.com/Philipp15b/go-steam
+    go get github.com/manveru/go-steam
 
 ## Usage
 
 You can view the documentation with the `godoc` tool or
-[online on godoc.org](http://godoc.org/github.com/Philipp15b/go-steam).
+[online on godoc.org](http://godoc.org/github.com/manveru/go-steam).
 
 When updating, always check the [`CHANGELOG.md`](CHANGELOG.md) first.
 
@@ -18,7 +18,7 @@ When updating, always check the [`CHANGELOG.md`](CHANGELOG.md) first.
 
 To update go-steam for a new version of SteamKit, do the following:
 
-	go get code.google.com/p/goprotobuf/protoc-gen-go
+    go get code.google.com/p/goprotobuf/protoc-gen-go
     git submodule init && git submodule update
     cd generator
     go run generator.go clean proto steamlang

@@ -2,6 +2,30 @@
 // source: steammessages_player.steamclient.proto
 // DO NOT EDIT!
 
+/*
+Package steammessages_player_steamclient is a generated protocol buffer package.
+
+It is generated from these files:
+	steammessages_player.steamclient.proto
+
+It has these top-level messages:
+	CPlayer_GetRecentlyPlayedGames_Request
+	CPlayer_GetRecentlyPlayedGames_Response
+	CPlayer_GetOwnedGames_Request
+	CPlayer_GetOwnedGames_Response
+	CPlayer_GetSteamLevel_Request
+	CPlayer_GetSteamLevel_Response
+	CPlayer_GetGameBadgeLevels_Request
+	CPlayer_GetGameBadgeLevels_Response
+	CPlayer_GetSteamLevelDistribution_Request
+	CPlayer_GetSteamLevelDistribution_Response
+	CPlayer_GetBadges_Request
+	CPlayer_GetBadges_Response
+	CPlayer_GetCommunityBadgeProgress_Request
+	CPlayer_GetCommunityBadgeProgress_Response
+	CPlayer_GetLastPlayedTimes_Request
+	CPlayer_GetLastPlayedTimes_Response
+*/
 package internal
 
 import proto "code.google.com/p/goprotobuf/proto"

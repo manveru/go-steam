@@ -2,6 +2,348 @@
 // source: steammessages_clientserver.proto
 // DO NOT EDIT!
 
+/*
+Package steammessages_clientserver is a generated protocol buffer package.
+
+It is generated from these files:
+	steammessages_clientserver.proto
+
+It has these top-level messages:
+	CMsgClientHeartBeat
+	CMsgClientSubscribeToPersonaFeed
+	CMsgClientUDSP2PSessionStarted
+	CMsgClientUDSP2PSessionEnded
+	CMsgClientRegisterAuthTicketWithCM
+	CMsgClientTicketAuthComplete
+	CMsgClientLogon
+	CMsgClientLogonResponse
+	CMsgClientRequestWebAPIAuthenticateUserNonce
+	CMsgClientRequestWebAPIAuthenticateUserNonceResponse
+	CMsgClientLogOff
+	CMsgClientLoggedOff
+	CMsgClientCMList
+	CMsgClientP2PConnectionInfo
+	CMsgClientP2PConnectionFailInfo
+	CMsgClientGetAppOwnershipTicket
+	CMsgClientGetAppOwnershipTicketResponse
+	CMsgClientSessionToken
+	CMsgClientGameConnectTokens
+	CMsgGSServerType
+	CMsgGSStatusReply
+	CMsgGSPlayerList
+	CMsgGSUserPlaying
+	CMsgGSDisconnectNotice
+	CMsgClientGamesPlayed
+	CMsgGSApprove
+	CMsgGSDeny
+	CMsgGSKick
+	CMsgClientAuthList
+	CMsgClientAuthListAck
+	CMsgClientFriendsList
+	CMsgClientFriendsGroupsList
+	CMsgClientPlayerNicknameList
+	CMsgClientSetPlayerNickname
+	CMsgClientSetPlayerNicknameResponse
+	CMsgClientLicenseList
+	CMsgClientLBSSetScore
+	CMsgClientLBSSetScoreResponse
+	CMsgClientLBSSetUGC
+	CMsgClientLBSSetUGCResponse
+	CMsgClientLBSFindOrCreateLB
+	CMsgClientLBSFindOrCreateLBResponse
+	CMsgClientLBSGetLBEntries
+	CMsgClientLBSGetLBEntriesResponse
+	CMsgClientAccountInfo
+	CMsgClientAppMinutesPlayedData
+	CMsgClientIsLimitedAccount
+	CMsgClientRequestFriendData
+	CMsgClientChangeStatus
+	CMsgPersonaChangeResponse
+	CMsgClientPersonaState
+	CMsgClientFriendProfileInfo
+	CMsgClientFriendProfileInfoResponse
+	CMsgClientServerList
+	CMsgClientRequestedClientStats
+	CMsgClientStat2
+	CMsgClientMMSCreateLobby
+	CMsgClientMMSCreateLobbyResponse
+	CMsgClientMMSJoinLobby
+	CMsgClientMMSJoinLobbyResponse
+	CMsgClientMMSLeaveLobby
+	CMsgClientMMSLeaveLobbyResponse
+	CMsgClientMMSGetLobbyList
+	CMsgClientMMSGetLobbyListResponse
+	CMsgClientMMSSetLobbyData
+	CMsgClientMMSSetLobbyDataResponse
+	CMsgClientMMSGetLobbyData
+	CMsgClientMMSLobbyData
+	CMsgClientMMSSendLobbyChatMsg
+	CMsgClientMMSLobbyChatMsg
+	CMsgClientMMSSetLobbyOwner
+	CMsgClientMMSSetLobbyOwnerResponse
+	CMsgClientMMSSetLobbyLinked
+	CMsgClientMMSSetLobbyGameServer
+	CMsgClientMMSLobbyGameServerSet
+	CMsgClientMMSUserJoinedLobby
+	CMsgClientMMSUserLeftLobby
+	CMsgClientMMSInviteToLobby
+	CMsgClientUDSInviteToGame
+	CMsgClientChatInvite
+	CMsgClientConnectionStats
+	CMsgClientServersAvailable
+	CMsgClientGetUserStats
+	CMsgClientGetUserStatsResponse
+	CMsgClientStoreUserStatsResponse
+	CMsgClientStoreUserStats2
+	CMsgClientStatsUpdated
+	CMsgClientStoreUserStats
+	CMsgClientGetClientDetails
+	CMsgClientReportOverlayDetourFailure
+	CMsgClientGetClientDetailsResponse
+	CMsgClientGetClientAppList
+	CMsgClientGetClientAppListResponse
+	CMsgClientInstallClientApp
+	CMsgClientInstallClientAppResponse
+	CMsgClientUninstallClientApp
+	CMsgClientUninstallClientAppResponse
+	CMsgClientSetClientAppUpdateState
+	CMsgClientSetClientAppUpdateStateResponse
+	CMsgClientUFSUploadFileRequest
+	CMsgClientUFSUploadFileResponse
+	CMsgClientUFSUploadCommit
+	CMsgClientUFSUploadCommitResponse
+	CMsgClientUFSFileChunk
+	CMsgClientUFSTransferHeartbeat
+	CMsgClientUFSUploadFileFinished
+	CMsgClientUFSDeleteFileRequest
+	CMsgClientUFSDeleteFileResponse
+	CMsgClientUFSGetFileListForApp
+	CMsgClientUFSGetFileListForAppResponse
+	CMsgClientUFSDownloadRequest
+	CMsgClientUFSDownloadResponse
+	CMsgClientUFSLoginRequest
+	CMsgClientUFSLoginResponse
+	CMsgClientRequestEncryptedAppTicket
+	CMsgClientRequestEncryptedAppTicketResponse
+	CMsgClientRequestOAuthTokenForApp
+	CMsgClientRequestOAuthTokenForAppResponse
+	CMsgClientWalletInfoUpdate
+	CMsgClientAppInfoUpdate
+	CMsgClientAppInfoChanges
+	CMsgClientAppInfoRequest
+	CMsgClientAppInfoResponse
+	CMsgClientPackageInfoRequest
+	CMsgClientPackageInfoResponse
+	CMsgPICSChangesSinceRequest
+	CMsgPICSChangesSinceResponse
+	CMsgPICSProductInfoRequest
+	CMsgPICSProductInfoResponse
+	CMsgPICSAccessTokenRequest
+	CMsgPICSAccessTokenResponse
+	CMsgClientUFSGetUGCDetails
+	CMsgClientUFSGetUGCDetailsResponse
+	CMsgClientUFSGetSingleFileInfo
+	CMsgClientUFSGetSingleFileInfoResponse
+	CMsgClientUFSShareFile
+	CMsgClientUFSShareFileResponse
+	CMsgClientNewLoginKey
+	CMsgClientNewLoginKeyAccepted
+	CMsgClientAMGetClanOfficers
+	CMsgClientAMGetClanOfficersResponse
+	CMsgClientAMGetPersonaNameHistory
+	CMsgClientAMGetPersonaNameHistoryResponse
+	CMsgClientDeregisterWithServer
+	CMsgClientClanState
+	CMsgClientFriendMsg
+	CMsgClientFriendMsgIncoming
+	CMsgClientAddFriend
+	CMsgClientAddFriendResponse
+	CMsgClientRemoveFriend
+	CMsgClientHideFriend
+	CMsgClientUCMAddScreenshot
+	CMsgClientUCMAddScreenshotResponse
+	CMsgClientUCMDeleteScreenshot
+	CMsgClientUCMDeleteScreenshotResponse
+	CMsgClientUCMPublishFile
+	CMsgClientUCMPublishFileResponse
+	CMsgClientUCMUpdatePublishedFile
+	CMsgClientUCMUpdatePublishedFileResponse
+	CMsgClientUCMGetPublishedFileDetails
+	CMsgClientUCMGetPublishedFileDetailsResponse
+	CMsgClientUCMDeletePublishedFile
+	CMsgClientUCMDeletePublishedFileResponse
+	CMsgClientUCMEnumerateUserPublishedFiles
+	CMsgClientUCMEnumerateUserPublishedFilesResponse
+	CMsgClientUCMSubscribePublishedFile
+	CMsgClientUCMSubscribePublishedFileResponse
+	CMsgClientUCMEnumerateUserSubscribedFiles
+	CMsgClientUCMEnumerateUserSubscribedFilesResponse
+	CMsgClientUCMEnumerateUserSubscribedFilesWithUpdates
+	CMsgClientUCMEnumerateUserSubscribedFilesWithUpdatesResponse
+	CMsgClientUCMUnsubscribePublishedFile
+	CMsgClientUCMUnsubscribePublishedFileResponse
+	CMsgClientUCMPublishedFileSubscribed
+	CMsgClientUCMPublishedFileUnsubscribed
+	CMsgClientUCMPublishedFileDeleted
+	CMsgClientUCMPublishedFileUpdated
+	CMsgClientUCMGetPublishedFilesForUser
+	CMsgClientUCMGetPublishedFilesForUserResponse
+	CMsgClientUCMSetUserPublishedFileAction
+	CMsgClientUCMSetUserPublishedFileActionResponse
+	CMsgClientUCMEnumeratePublishedFilesByUserAction
+	CMsgClientUCMEnumeratePublishedFilesByUserActionResponse
+	CMsgClientScreenshotsChanged
+	CMsgClientUpdateUserGameInfo
+	CMsgClientRichPresenceUpload
+	CMsgClientRichPresenceRequest
+	CMsgClientRichPresenceInfo
+	CMsgClientCheckFileSignature
+	CMsgClientCheckFileSignatureResponse
+	CMsgClientReadMachineAuth
+	CMsgClientReadMachineAuthResponse
+	CMsgClientUpdateMachineAuth
+	CMsgClientUpdateMachineAuthResponse
+	CMsgClientRequestMachineAuth
+	CMsgClientRequestMachineAuthResponse
+	CMsgClientChangeSteamGuardOptions
+	CMsgClientChangeSteamGuardOptionsResponse
+	CMsgClientCreateFriendsGroup
+	CMsgClientCreateFriendsGroupResponse
+	CMsgClientDeleteFriendsGroup
+	CMsgClientDeleteFriendsGroupResponse
+	CMsgClientRenameFriendsGroup
+	CMsgClientRenameFriendsGroupResponse
+	CMsgClientAddFriendToGroup
+	CMsgClientAddFriendToGroupResponse
+	CMsgClientRemoveFriendFromGroup
+	CMsgClientRemoveFriendFromGroupResponse
+	CMsgClientRegisterKey
+	CMsgClientPurchaseResponse
+	CMsgClientActivateOEMLicense
+	CMsgClientRegisterOEMMachine
+	CMsgClientRegisterOEMMachineResponse
+	CMsgClientPurchaseWithMachineID
+	CMsgTrading_InitiateTradeRequest
+	CMsgTrading_InitiateTradeResponse
+	CMsgTrading_CancelTradeRequest
+	CMsgTrading_StartSession
+	CMsgClientMDSInitDepotBuildRequest
+	CMsgClientMDSInitDepotBuildResponse
+	CMsgClientMDSLoginRequest
+	CMsgClientMDSLoginResponse
+	CMsgClientMDSUploadDepotChunks
+	CMsgClientMDSUploadDepotChunksResponse
+	CMsgClientMDSUploadRateTest
+	CMsgClientMDSUploadRateTestResponse
+	CMsgClientMDSTransmitManifestDataChunk
+	CMsgClientMDSUploadManifestRequest
+	CMsgClientMDSUploadManifestResponse
+	CMsgClientMDSGetDepotManifest
+	CMsgClientMDSGetDepotManifestResponse
+	CMsgClientMDSGetDepotManifestChunk
+	CMsgClientMDSRegisterAppBuild
+	CMsgClientMDSRegisterAppBuildResponse
+	CMsgMDSSetAppBuildLive
+	CMsgMDSSetAppBuildLiveResponse
+	CMsgClientMDSSignInstallScript
+	CMsgClientMDSSignInstallScriptResponse
+	CMsgClientEmailChange
+	CMsgClientEmailChangeResponse
+	CMsgClientGetCDNAuthToken
+	CMsgClientGetDepotDecryptionKey
+	CMsgClientGetDepotDecryptionKeyResponse
+	CMsgClientGetAppBetaPasswords
+	CMsgClientGetAppBetaPasswordsResponse
+	CMsgClientUpdateAppJobReport
+	CMsgClientSteam2AppStarted
+	CMsgClientGetCDNAuthTokenResponse
+	CMsgDownloadRateStatistics
+	CMsgClientRequestAccountData
+	CMsgClientRequestAccountDataResponse
+	CMsgClientUGSGetGlobalStats
+	CMsgClientUGSGetGlobalStatsResponse
+	CMsgGameServerData
+	CMsgGameServerRemove
+	CMsgClientGMSServerQuery
+	CMsgGMSClientServerQueryResponse
+	CMsgGameServerOutOfDate
+	CMsgClientRedeemGuestPass
+	CMsgClientRedeemGuestPassResponse
+	CMsgClientGetClanActivityCounts
+	CMsgClientGetClanActivityCountsResponse
+	CMsgClientOGSReportString
+	CMsgClientOGSReportBug
+	CMsgGSAssociateWithClan
+	CMsgGSAssociateWithClanResponse
+	CMsgGSComputeNewPlayerCompatibility
+	CMsgGSComputeNewPlayerCompatibilityResponse
+	CMsgClientSentLogs
+	CMsgGCClient
+	CMsgClientRequestFreeLicense
+	CMsgClientRequestFreeLicenseResponse
+	CMsgDRMDownloadRequestWithCrashData
+	CMsgDRMDownloadResponse
+	CMsgDRMFinalResult
+	CMsgClientDPCheckSpecialSurvey
+	CMsgClientDPCheckSpecialSurveyResponse
+	CMsgClientDPSendSpecialSurveyResponse
+	CMsgClientDPSendSpecialSurveyResponseReply
+	CMsgClientRequestForgottenPasswordEmail
+	CMsgClientRequestForgottenPasswordEmailResponse
+	CMsgClientItemAnnouncements
+	CMsgClientRequestItemAnnouncements
+	CMsgClientUserNotifications
+	CMsgClientCommentNotifications
+	CMsgClientRequestCommentNotifications
+	CMsgClientOfflineMessageNotification
+	CMsgClientRequestOfflineMessageCount
+	CMsgClientFSGetFriendMessageHistory
+	CMsgClientFSGetFriendMessageHistoryResponse
+	CMsgClientFSGetFriendMessageHistoryForOfflineMessages
+	CMsgClientFSGetFriendsSteamLevels
+	CMsgClientFSGetFriendsSteamLevelsResponse
+	CMsgClientEmailAddrInfo
+	CMsgCREEnumeratePublishedFiles
+	CMsgCREEnumeratePublishedFilesResponse
+	CMsgCRERankByVote
+	CMsgCRERankByVoteResponse
+	CMsgCRERankByTrend
+	CMsgCRERankByTrendResponse
+	CMsgCREItemVoteSummary
+	CMsgCREItemVoteSummaryResponse
+	CMsgCREUpdateUserPublishedItemVote
+	CMsgCREUpdateUserPublishedItemVoteResponse
+	CMsgCREGetUserPublishedItemVoteDetails
+	CMsgCREGetUserPublishedItemVoteDetailsResponse
+	CMsgGameServerPingSample
+	CMsgFSGetFollowerCount
+	CMsgFSGetFollowerCountResponse
+	CMsgFSGetIsFollowing
+	CMsgFSGetIsFollowingResponse
+	CMsgFSEnumerateFollowingList
+	CMsgFSEnumerateFollowingListResponse
+	CMsgDPGetNumberOfCurrentPlayers
+	CMsgDPGetNumberOfCurrentPlayersResponse
+	CMsgClientFriendUserStatusPublished
+	CMsgClientServiceMethod
+	CMsgClientServiceMethodResponse
+	CMsgClientUIMode
+	CMsgClientVanityURLChangedNotification
+	CMsgClientAuthorizeLocalDeviceRequest
+	CMsgClientAuthorizeLocalDevice
+	CMsgClientDeauthorizeLocalDeviceRequest
+	CMsgClientDeauthorizeLocalDevice
+	CMsgClientUseLocalDeviceAuthorizations
+	CMsgClientGetAuthorizedDevices
+	CMsgClientGetAuthorizedDevicesResponse
+	CMsgClientGetEmoticonList
+	CMsgClientEmoticonList
+	CMsgClientSharedLibraryLockStatus
+	CMsgClientSharedLibraryStopPlaying
+	CMsgClientServiceCall
+	CMsgClientServiceModule
+	CMsgClientServiceCallResponse
+*/
 package internal
 
 import proto "code.google.com/p/goprotobuf/proto"
@@ -1239,7 +1581,6 @@ type CMsgClientGamesPlayed_GamePlayed struct {
 	ProcessId           *uint32 `protobuf:"varint,9,opt,name=process_id" json:"process_id,omitempty"`
 	StreamingProviderId *uint32 `protobuf:"varint,10,opt,name=streaming_provider_id" json:"streaming_provider_id,omitempty"`
 	GameFlags           *uint32 `protobuf:"varint,11,opt,name=game_flags" json:"game_flags,omitempty"`
-	OwnerId             *uint32 `protobuf:"varint,12,opt,name=owner_id" json:"owner_id,omitempty"`
 	XXX_unrecognized    []byte  `json:"-"`
 }
 
@@ -1320,13 +1661,6 @@ func (m *CMsgClientGamesPlayed_GamePlayed) GetStreamingProviderId() uint32 {
 func (m *CMsgClientGamesPlayed_GamePlayed) GetGameFlags() uint32 {
 	if m != nil && m.GameFlags != nil {
 		return *m.GameFlags
-	}
-	return 0
-}
-
-func (m *CMsgClientGamesPlayed_GamePlayed) GetOwnerId() uint32 {
-	if m != nil && m.OwnerId != nil {
-		return *m.OwnerId
 	}
 	return 0
 }
@@ -2809,6 +3143,7 @@ type CMsgClientFriendProfileInfoResponse struct {
 	CountryName      *string `protobuf:"bytes,7,opt,name=country_name" json:"country_name,omitempty"`
 	Headline         *string `protobuf:"bytes,8,opt,name=headline" json:"headline,omitempty"`
 	Summary          *string `protobuf:"bytes,9,opt,name=summary" json:"summary,omitempty"`
+	RecentPlaytime   *uint32 `protobuf:"varint,10,opt,name=recent_playtime" json:"recent_playtime,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
@@ -2879,6 +3214,13 @@ func (m *CMsgClientFriendProfileInfoResponse) GetSummary() string {
 		return *m.Summary
 	}
 	return ""
+}
+
+func (m *CMsgClientFriendProfileInfoResponse) GetRecentPlaytime() uint32 {
+	if m != nil && m.RecentPlaytime != nil {
+		return *m.RecentPlaytime
+	}
+	return 0
 }
 
 type CMsgClientServerList struct {
@@ -8584,7 +8926,6 @@ type CMsgClientUCMGetPublishedFileDetailsResponse struct {
 	PreviewFileSize  *uint32  `protobuf:"varint,17,opt,name=preview_file_size" json:"preview_file_size,omitempty"`
 	Url              *string  `protobuf:"bytes,18,opt,name=url" json:"url,omitempty"`
 	FileType         *uint32  `protobuf:"varint,19,opt,name=file_type" json:"file_type,omitempty"`
-	AcceptedForUse   *bool    `protobuf:"varint,20,opt,name=accepted_for_use" json:"accepted_for_use,omitempty"`
 	XXX_unrecognized []byte   `json:"-"`
 }
 
@@ -8732,13 +9073,6 @@ func (m *CMsgClientUCMGetPublishedFileDetailsResponse) GetFileType() uint32 {
 		return *m.FileType
 	}
 	return 0
-}
-
-func (m *CMsgClientUCMGetPublishedFileDetailsResponse) GetAcceptedForUse() bool {
-	if m != nil && m.AcceptedForUse != nil {
-		return *m.AcceptedForUse
-	}
-	return false
 }
 
 type CMsgClientUCMDeletePublishedFile struct {
@@ -14838,50 +15172,44 @@ func (m *CMsgClientAuthorizeLocalDevice) GetAuthedDeviceToken() uint64 {
 	return 0
 }
 
-type CMsgClientDeauthorizeDeviceRequest struct {
-	DeauthorizationAccountId   *uint32 `protobuf:"varint,1,opt,name=deauthorization_account_id" json:"deauthorization_account_id,omitempty"`
-	DeauthorizationDeviceToken *uint64 `protobuf:"varint,2,opt,name=deauthorization_device_token" json:"deauthorization_device_token,omitempty"`
-	XXX_unrecognized           []byte  `json:"-"`
+type CMsgClientDeauthorizeLocalDeviceRequest struct {
+	DeauthorizationAccountId *uint32 `protobuf:"varint,1,opt,name=deauthorization_account_id" json:"deauthorization_account_id,omitempty"`
+	XXX_unrecognized         []byte  `json:"-"`
 }
 
-func (m *CMsgClientDeauthorizeDeviceRequest) Reset()         { *m = CMsgClientDeauthorizeDeviceRequest{} }
-func (m *CMsgClientDeauthorizeDeviceRequest) String() string { return proto.CompactTextString(m) }
-func (*CMsgClientDeauthorizeDeviceRequest) ProtoMessage()    {}
+func (m *CMsgClientDeauthorizeLocalDeviceRequest) Reset() {
+	*m = CMsgClientDeauthorizeLocalDeviceRequest{}
+}
+func (m *CMsgClientDeauthorizeLocalDeviceRequest) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientDeauthorizeLocalDeviceRequest) ProtoMessage()    {}
 
-func (m *CMsgClientDeauthorizeDeviceRequest) GetDeauthorizationAccountId() uint32 {
+func (m *CMsgClientDeauthorizeLocalDeviceRequest) GetDeauthorizationAccountId() uint32 {
 	if m != nil && m.DeauthorizationAccountId != nil {
 		return *m.DeauthorizationAccountId
 	}
 	return 0
 }
 
-func (m *CMsgClientDeauthorizeDeviceRequest) GetDeauthorizationDeviceToken() uint64 {
-	if m != nil && m.DeauthorizationDeviceToken != nil {
-		return *m.DeauthorizationDeviceToken
-	}
-	return 0
-}
-
-type CMsgClientDeauthorizeDevice struct {
+type CMsgClientDeauthorizeLocalDevice struct {
 	Eresult                  *int32  `protobuf:"varint,1,opt,name=eresult,def=2" json:"eresult,omitempty"`
 	DeauthorizationAccountId *uint32 `protobuf:"varint,2,opt,name=deauthorization_account_id" json:"deauthorization_account_id,omitempty"`
 	XXX_unrecognized         []byte  `json:"-"`
 }
 
-func (m *CMsgClientDeauthorizeDevice) Reset()         { *m = CMsgClientDeauthorizeDevice{} }
-func (m *CMsgClientDeauthorizeDevice) String() string { return proto.CompactTextString(m) }
-func (*CMsgClientDeauthorizeDevice) ProtoMessage()    {}
+func (m *CMsgClientDeauthorizeLocalDevice) Reset()         { *m = CMsgClientDeauthorizeLocalDevice{} }
+func (m *CMsgClientDeauthorizeLocalDevice) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientDeauthorizeLocalDevice) ProtoMessage()    {}
 
-const Default_CMsgClientDeauthorizeDevice_Eresult int32 = 2
+const Default_CMsgClientDeauthorizeLocalDevice_Eresult int32 = 2
 
-func (m *CMsgClientDeauthorizeDevice) GetEresult() int32 {
+func (m *CMsgClientDeauthorizeLocalDevice) GetEresult() int32 {
 	if m != nil && m.Eresult != nil {
 		return *m.Eresult
 	}
-	return Default_CMsgClientDeauthorizeDevice_Eresult
+	return Default_CMsgClientDeauthorizeLocalDevice_Eresult
 }
 
-func (m *CMsgClientDeauthorizeDevice) GetDeauthorizationAccountId() uint32 {
+func (m *CMsgClientDeauthorizeLocalDevice) GetDeauthorizationAccountId() uint32 {
 	if m != nil && m.DeauthorizationAccountId != nil {
 		return *m.DeauthorizationAccountId
 	}
@@ -14889,9 +15217,8 @@ func (m *CMsgClientDeauthorizeDevice) GetDeauthorizationAccountId() uint32 {
 }
 
 type CMsgClientUseLocalDeviceAuthorizations struct {
-	AuthorizationAccountId []uint32                                              `protobuf:"varint,1,rep,name=authorization_account_id" json:"authorization_account_id,omitempty"`
-	DeviceTokens           []*CMsgClientUseLocalDeviceAuthorizations_DeviceToken `protobuf:"bytes,2,rep,name=device_tokens" json:"device_tokens,omitempty"`
-	XXX_unrecognized       []byte                                                `json:"-"`
+	AuthorizationAccountId []uint32 `protobuf:"varint,1,rep,name=authorization_account_id" json:"authorization_account_id,omitempty"`
+	XXX_unrecognized       []byte   `json:"-"`
 }
 
 func (m *CMsgClientUseLocalDeviceAuthorizations) Reset() {
@@ -14905,41 +15232,6 @@ func (m *CMsgClientUseLocalDeviceAuthorizations) GetAuthorizationAccountId() []u
 		return m.AuthorizationAccountId
 	}
 	return nil
-}
-
-func (m *CMsgClientUseLocalDeviceAuthorizations) GetDeviceTokens() []*CMsgClientUseLocalDeviceAuthorizations_DeviceToken {
-	if m != nil {
-		return m.DeviceTokens
-	}
-	return nil
-}
-
-type CMsgClientUseLocalDeviceAuthorizations_DeviceToken struct {
-	OwnerAccountId   *uint32 `protobuf:"varint,1,opt,name=owner_account_id" json:"owner_account_id,omitempty"`
-	TokenId          *uint64 `protobuf:"varint,2,opt,name=token_id" json:"token_id,omitempty"`
-	XXX_unrecognized []byte  `json:"-"`
-}
-
-func (m *CMsgClientUseLocalDeviceAuthorizations_DeviceToken) Reset() {
-	*m = CMsgClientUseLocalDeviceAuthorizations_DeviceToken{}
-}
-func (m *CMsgClientUseLocalDeviceAuthorizations_DeviceToken) String() string {
-	return proto.CompactTextString(m)
-}
-func (*CMsgClientUseLocalDeviceAuthorizations_DeviceToken) ProtoMessage() {}
-
-func (m *CMsgClientUseLocalDeviceAuthorizations_DeviceToken) GetOwnerAccountId() uint32 {
-	if m != nil && m.OwnerAccountId != nil {
-		return *m.OwnerAccountId
-	}
-	return 0
-}
-
-func (m *CMsgClientUseLocalDeviceAuthorizations_DeviceToken) GetTokenId() uint64 {
-	if m != nil && m.TokenId != nil {
-		return *m.TokenId
-	}
-	return 0
 }
 
 type CMsgClientGetAuthorizedDevices struct {
