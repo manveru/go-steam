@@ -70,7 +70,6 @@ func (a *Auth) handleClientLogOnResponse(packet *PacketMsg) {
 	msg := packet.ReadProtoMsg(body)
 
 	result := EResult(body.GetEresult())
-	log.Println(result)
 	if result == EResult_OK {
 		atomic.StoreInt32(&a.client.sessionId, msg.Header.Proto.GetClientSessionid())
 		atomic.StoreUint64(&a.client.steamId, msg.Header.Proto.GetSteamid())
@@ -80,6 +79,7 @@ func (a *Auth) handleClientLogOnResponse(packet *PacketMsg) {
 		a.client.Emit(&LoggedOnEvent{})
 	} else if result == EResult_Fail || result == EResult_ServiceUnavailable || result == EResult_TryAnotherCM {
 		// some error on Steam's side, we'll get an EOF later
+		log.Println(result)
 	} else {
 		a.client.Fatalf("Login error: %v", result)
 	}
