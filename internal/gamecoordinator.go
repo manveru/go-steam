@@ -35,6 +35,10 @@ func NewGCMsgProtobuf(appId, msgType uint32, body proto.Message) *GCMsgProtobuf 
 	}
 }
 
+func (g *GCMsgProtobuf) GetAppId() uint32 {
+	return g.AppId
+}
+
 func (g *GCMsgProtobuf) IsProto() bool {
 	return true
 }

@@ -12,7 +12,6 @@ import (
 	"hash/crc32"
 	"io/ioutil"
 	"log"
-	"sync"
 	"sync/atomic"
 	"time"
 )
@@ -42,11 +41,11 @@ type Client struct {
 
 	ConnectionTimeout time.Duration
 
-	mutex     sync.RWMutex // guarding connection, heartbeat and writeChan
-	conn      connection
-	writeChan chan IMsg
-	writeBuf  *bytes.Buffer
-	heartbeat *time.Ticker
+	conn        connection
+	writeChan   chan IMsg
+	writeBuf    *bytes.Buffer
+	heartbeat   *time.Ticker
+	isConnected bool
 }
 
 type PacketHandler interface {
@@ -55,9 +54,7 @@ type PacketHandler interface {
 
 func NewClient() *Client {
 	client := &Client{
-		events:    make(chan interface{}, 3),
-		writeChan: make(chan IMsg, 5),
-		writeBuf:  new(bytes.Buffer),
+		events: make(chan interface{}, 3),
 	}
 	client.Auth = &Auth{client: client}
 	client.RegisterPacketHandler(client.Auth)
@@ -114,9 +111,7 @@ func (c *Client) SessionId() int32 {
 }
 
 func (c *Client) Connected() bool {
-	c.mutex.RLock()
-	defer c.mutex.RUnlock()
-	return c.conn != nil
+	return c.isConnected
 }
 
 // Connects to a random server of the Steam network and returns the server.
@@ -130,33 +125,28 @@ func (c *Client) Connect() string {
 // Connects to a specific server.
 // If this client is already connected, it is disconnected first.
 func (c *Client) ConnectTo(address string) {
-	c.Disconnect()
-
+	log.Println("Connecting to", address)
 	conn, err := dialTCP(address)
 	if err != nil {
 		log.Fatal(err)
 	}
 	c.conn = conn
+	c.writeChan = make(chan IMsg, 5)
+	c.writeBuf = new(bytes.Buffer)
 
 	go c.readLoop()
 	go c.writeLoop()
+
+	c.isConnected = true
+
+	log.Println("Connected")
 }
 
 func (c *Client) Disconnect() {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	if c.conn == nil {
-		return
-	}
-
-	c.conn.Close()
-	c.conn = nil
-	if c.heartbeat != nil {
-		c.heartbeat.Stop()
-		c.heartbeat = nil
-	}
+	c.stopHeartbeatLoop()
 	close(c.writeChan)
+	c.conn.Close()
+	c.isConnected = false
 }
 
 // Adds a message to the send queue. Modifications to the given message after
@@ -168,19 +158,12 @@ func (c *Client) Write(msg IMsg) {
 		cm.SetSessionId(c.SessionId())
 		cm.SetSteamId(c.SteamId())
 	}
-	c.mutex.RLock()
-	defer c.mutex.RUnlock()
-	if c.conn == nil {
-		return
-	}
 	c.writeChan <- msg
 }
 
 func (c *Client) readLoop() {
 	for {
-		c.mutex.RLock()
 		packet, err := c.conn.Read()
-		c.mutex.RUnlock()
 		if err != nil {
 			c.Fatalf("Error reading from the connection: %v", err)
 			return
@@ -190,18 +173,7 @@ func (c *Client) readLoop() {
 }
 
 func (c *Client) writeLoop() {
-	for {
-		c.mutex.RLock()
-		if c.conn == nil {
-			c.mutex.RUnlock()
-			return
-		}
-		msg, ok := <-c.writeChan
-		c.mutex.RUnlock()
-		if !ok {
-			return
-		}
-
+	for msg := range c.writeChan {
 		err := msg.Serialize(c.writeBuf)
 		if err != nil {
 			c.writeBuf.Reset()
@@ -209,9 +181,7 @@ func (c *Client) writeLoop() {
 			return
 		}
 
-		c.mutex.RLock()
 		err = c.conn.Write(c.writeBuf.Bytes())
-		c.mutex.RLock()
 
 		c.writeBuf.Reset()
 
@@ -224,17 +194,21 @@ func (c *Client) writeLoop() {
 }
 
 func (c *Client) heartbeatLoop(seconds time.Duration) {
-	if c.heartbeat != nil {
-		c.heartbeat.Stop()
-	}
+	c.stopHeartbeatLoop()
 	c.heartbeat = time.NewTicker(seconds * time.Second)
-	for {
-		_, ok := <-c.heartbeat.C
-		if !ok {
-			break
-		}
+
+	defer c.stopHeartbeatLoop()
+
+	for _ = range c.heartbeat.C {
 		c.Write(NewClientMsgProtobuf(EMsg_ClientHeartBeat, new(CMsgClientHeartBeat)))
 	}
+}
+
+func (c *Client) stopHeartbeatLoop() {
+	if c.heartbeat == nil {
+		return
+	}
+	c.heartbeat.Stop()
 	c.heartbeat = nil
 }
 
