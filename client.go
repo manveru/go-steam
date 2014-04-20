@@ -144,7 +144,6 @@ func (c *Client) ConnectTo(address string) {
 
 func (c *Client) Disconnect() {
 	c.stopHeartbeatLoop()
-	close(c.writeChan)
 	c.conn.Close()
 	c.isConnected = false
 }
@@ -162,7 +161,7 @@ func (c *Client) Write(msg IMsg) {
 }
 
 func (c *Client) readLoop() {
-	for {
+	for c.isConnected {
 		packet, err := c.conn.Read()
 		if err != nil {
 			c.Fatalf("Error reading from the connection: %v", err)
@@ -174,6 +173,10 @@ func (c *Client) readLoop() {
 
 func (c *Client) writeLoop() {
 	for msg := range c.writeChan {
+		if !c.isConnected {
+			continue
+		}
+
 		err := msg.Serialize(c.writeBuf)
 		if err != nil {
 			c.writeBuf.Reset()
