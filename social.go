@@ -43,6 +43,10 @@ func (s *Social) HandlePacket(packet *PacketMsg) {
 	}
 }
 
+func (s *Social) ChangeStatus(status *CMsgClientChangeStatus) {
+	s.client.Write(NewClientMsgProtobuf(EMsg_ClientChangeStatus, status))
+}
+
 func (s *Social) SetPersonaName(name string) {
 	s.client.Write(NewClientMsgProtobuf(EMsg_ClientChangeStatus, &CMsgClientChangeStatus{
 		PlayerName: proto.String(name),
