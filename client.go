@@ -6,14 +6,15 @@ import (
 	"crypto/rand"
 	"encoding/binary"
 	"fmt"
-	"github.com/manveru/go-steam/cryptoutil"
-	. "github.com/manveru/go-steam/internal"
-	. "github.com/manveru/go-steam/steamid"
 	"hash/crc32"
 	"io/ioutil"
 	"log"
 	"sync/atomic"
 	"time"
+
+	"github.com/manveru/go-steam/cryptoutil"
+	. "github.com/manveru/go-steam/internal"
+	. "github.com/manveru/go-steam/steamid"
 )
 
 // Represents a client to the Steam network.
@@ -223,6 +224,8 @@ func (c *Client) handlePacket(packet *PacketMsg) {
 		c.handleChannelEncryptResult(packet)
 	case EMsg_Multi:
 		c.handleMulti(packet)
+	case EMsg_ClientCMList:
+		updateServerList(packet)
 	}
 	for _, handler := range c.handlers {
 		handler.HandlePacket(packet)
