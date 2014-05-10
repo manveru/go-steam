@@ -12,6 +12,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/manveru/go-steam/cryptoutil"
 	. "github.com/manveru/go-steam/internal"
 	. "github.com/manveru/go-steam/steamid"
@@ -224,6 +225,8 @@ func (c *Client) handlePacket(packet *PacketMsg) {
 		c.handleChannelEncryptResult(packet)
 	case EMsg_Multi:
 		c.handleMulti(packet)
+	case EMsg_ClientLoggedOff:
+		c.clientLoggedOff(packet)
 	case EMsg_ClientCMList:
 		updateServerList(packet)
 	}
@@ -310,5 +313,20 @@ func (c *Client) handleMulti(packet *PacketMsg) {
 		}
 		c.handlePacket(p)
 	}
+}
 
+func (c *Client) clientLoggedOff(packet *PacketMsg) {
+	msg := &CMsgClientLoggedOff{}
+	packet.ReadProtoMsg(msg)
+
+	switch msg.GetEresult() {
+	case EResult_LoggedInElsewhere:
+		c.onLoggedInElsewhere()
+	default:
+		c.Errorf("Client Logged Off: %s", spew.Sdump(msg))
+	}
+}
+
+func (c *Client) onLoggedInElsewhere() {
+	c.Fatalf("Logged in elsewhere")
 }
