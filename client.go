@@ -12,7 +12,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/manveru/go-steam/cryptoutil"
 	. "github.com/manveru/go-steam/internal"
 	. "github.com/manveru/go-steam/steamid"
@@ -319,14 +318,5 @@ func (c *Client) clientLoggedOff(packet *PacketMsg) {
 	msg := &CMsgClientLoggedOff{}
 	packet.ReadProtoMsg(msg)
 
-	switch msg.GetEresult() {
-	case EResult_LoggedInElsewhere:
-		c.onLoggedInElsewhere()
-	default:
-		c.Errorf("Client Logged Off: %s", spew.Sdump(msg))
-	}
-}
-
-func (c *Client) onLoggedInElsewhere() {
-	c.Fatalf("Logged in elsewhere")
+	c.Errorf("Client Logged Off: %s", EResult(msg.GetEresult()).String())
 }
