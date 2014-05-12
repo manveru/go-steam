@@ -9,6 +9,7 @@ import (
 	"hash/crc32"
 	"io/ioutil"
 	"log"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -43,10 +44,12 @@ type Client struct {
 	ConnectionTimeout time.Duration
 
 	conn        connection
+	connMutex   sync.RWMutex
 	writeChan   chan IMsg
 	writeBuf    *bytes.Buffer
 	heartbeat   *time.Ticker
 	isConnected bool
+	address     string
 }
 
 type PacketHandler interface {
@@ -85,8 +88,8 @@ type FatalError error
 
 // Emits a FatalError formatted with fmt.Errorf and disconnects.
 func (c *Client) Fatalf(format string, a ...interface{}) {
+	defer c.Disconnect()
 	c.Emit(FatalError(fmt.Errorf(format, a...)))
-	c.Disconnect()
 }
 
 // Emits an error formatted with fmt.Errorf.
@@ -127,11 +130,17 @@ func (c *Client) Connect() string {
 // If this client is already connected, it is disconnected first.
 func (c *Client) ConnectTo(address string) {
 	log.Println("Connecting to", address)
+
+	c.Disconnect()
+
 	conn, err := dialTCP(address)
 	if err != nil {
 		log.Fatal(err)
 	}
+	c.address = address
+	c.connMutex.Lock()
 	c.conn = conn
+	c.connMutex.Unlock()
 	c.writeChan = make(chan IMsg, 5)
 	c.writeBuf = new(bytes.Buffer)
 
@@ -140,12 +149,20 @@ func (c *Client) ConnectTo(address string) {
 
 	c.isConnected = true
 
-	log.Println("Connected")
+	log.Println("Connected to", address)
 }
 
 func (c *Client) Disconnect() {
+	c.connMutex.Lock()
+	defer c.connMutex.Unlock()
+
+	if c.conn == nil {
+		return
+	}
+	log.Println("Disconnecting from", c.address)
 	c.stopHeartbeatLoop()
 	c.conn.Close()
+	c.conn = nil
 	c.isConnected = false
 }
 
@@ -162,8 +179,14 @@ func (c *Client) Write(msg IMsg) {
 }
 
 func (c *Client) readLoop() {
-	for c.isConnected {
+	for {
+		c.connMutex.RLock()
+		if !c.isConnected {
+			c.connMutex.RUnlock()
+			return
+		}
 		packet, err := c.conn.Read()
+		c.connMutex.RUnlock()
 		if err != nil {
 			c.Fatalf("Error reading from the connection: %v", err)
 			return
@@ -185,7 +208,9 @@ func (c *Client) writeLoop() {
 			return
 		}
 
+		c.connMutex.RLock()
 		err = c.conn.Write(c.writeBuf.Bytes())
+		c.connMutex.RUnlock()
 
 		c.writeBuf.Reset()
 
@@ -267,7 +292,9 @@ func (c *Client) handleChannelEncryptResult(packet *PacketMsg) {
 		c.Fatalf("Encryption failed: %v", body.Result)
 		return
 	}
+	c.connMutex.Lock()
 	c.conn.SetEncryptionKey(c.tempSessionKey)
+	c.connMutex.Unlock()
 	c.tempSessionKey = nil
 
 	c.Emit(new(ConnectedEvent))
