@@ -73,6 +73,14 @@ func NewClient() *Client {
 	return client
 }
 
+func (c *Client) withConn(f func()) {
+	defer c.connMutex.Unlock()
+	c.connMutex.Lock()
+	if c.conn != nil {
+		f()
+	}
+}
+
 // Get the event channel. By convention all events are pointers, except for errors.
 func (c *Client) Events() <-chan interface{} {
 	return c.events
@@ -138,9 +146,7 @@ func (c *Client) ConnectTo(address string) {
 		log.Fatal(err)
 	}
 	c.address = address
-	c.connMutex.Lock()
-	c.conn = conn
-	c.connMutex.Unlock()
+	c.withConn(func() { c.conn = conn })
 	c.writeChan = make(chan IMsg, 5)
 	c.writeBuf = new(bytes.Buffer)
 
@@ -153,17 +159,16 @@ func (c *Client) ConnectTo(address string) {
 }
 
 func (c *Client) Disconnect() {
-	c.connMutex.Lock()
-	defer c.connMutex.Unlock()
-
-	if c.conn == nil {
-		return
-	}
-	log.Println("Disconnecting from", c.address)
-	c.stopHeartbeatLoop()
-	c.conn.Close()
-	c.conn = nil
-	c.isConnected = false
+	c.withConn(func() {
+		if c.conn == nil {
+			return
+		}
+		log.Println("Disconnecting from", c.address)
+		c.stopHeartbeatLoop()
+		c.conn.Close()
+		c.conn = nil
+		c.isConnected = false
+	})
 }
 
 // Adds a message to the send queue. Modifications to the given message after
@@ -179,19 +184,23 @@ func (c *Client) Write(msg IMsg) {
 }
 
 func (c *Client) readLoop() {
+	var packet *PacketMsg
+	var err error
+
 	for {
-		c.connMutex.RLock()
-		if !c.isConnected {
-			c.connMutex.RUnlock()
-			return
-		}
-		packet, err := c.conn.Read()
-		c.connMutex.RUnlock()
-		if err != nil {
+		c.withConn(func() {
+			packet, err = c.conn.Read()
+		})
+		if err == nil {
+			if packet == nil {
+				<-time.After(500 * time.Millisecond)
+			} else {
+				c.handlePacket(packet)
+			}
+		} else {
 			c.Fatalf("Error reading from the connection: %v", err)
 			return
 		}
-		c.handlePacket(packet)
 	}
 }
 
@@ -208,14 +217,13 @@ func (c *Client) writeLoop() {
 			return
 		}
 
-		c.connMutex.RLock()
-		err = c.conn.Write(c.writeBuf.Bytes())
-		c.connMutex.RUnlock()
+		c.withConn(func() {
+			err = c.conn.Write(c.writeBuf.Bytes())
+		})
 
 		c.writeBuf.Reset()
 
 		if err != nil {
-			c.writeBuf.Reset()
 			c.Errorf("Error writing message %v: %v", msg, err)
 			return
 		}
@@ -292,9 +300,9 @@ func (c *Client) handleChannelEncryptResult(packet *PacketMsg) {
 		c.Fatalf("Encryption failed: %v", body.Result)
 		return
 	}
-	c.connMutex.Lock()
-	c.conn.SetEncryptionKey(c.tempSessionKey)
-	c.connMutex.Unlock()
+	c.withConn(func() {
+		c.conn.SetEncryptionKey(c.tempSessionKey)
+	})
 	c.tempSessionKey = nil
 
 	c.Emit(new(ConnectedEvent))
