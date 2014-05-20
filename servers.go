@@ -18,7 +18,7 @@ import (
 var lockCMServers = sync.RWMutex{}
 
 func getRandomCM() string {
-	rng := rand.New(rand.NewSource(time.Now().Unix()))
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	lockCMServers.RLock()
 	defer lockCMServers.RUnlock()
 	return CMServers[rng.Int31n(int32(len(CMServers)))]
