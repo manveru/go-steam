@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"hash/crc32"
 	"io/ioutil"
-	"log"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -43,13 +42,11 @@ type Client struct {
 
 	ConnectionTimeout time.Duration
 
-	conn        connection
-	connMutex   sync.RWMutex
-	writeChan   chan IMsg
-	writeBuf    *bytes.Buffer
-	heartbeat   *time.Ticker
-	isConnected bool
-	address     string
+	conn      connection
+	connMutex sync.RWMutex
+	writeChan chan IMsg
+	heartbeat *time.Ticker
+	address   string
 }
 
 type PacketHandler interface {
@@ -71,14 +68,6 @@ func NewClient() *Client {
 	client.GC = newGC(client)
 	client.RegisterPacketHandler(client.GC)
 	return client
-}
-
-func (c *Client) withConn(f func()) {
-	defer c.connMutex.Unlock()
-	c.connMutex.Lock()
-	if c.conn != nil {
-		f()
-	}
 }
 
 // Get the event channel. By convention all events are pointers, except for errors.
@@ -105,6 +94,11 @@ func (c *Client) Errorf(format string, a ...interface{}) {
 	c.Emit(fmt.Errorf(format, a...))
 }
 
+// Emits an info log event
+func (c *Client) Infof(format string, a ...interface{}) {
+	c.Emit(fmt.Sprintf(format, a...))
+}
+
 // Registers a PacketHandler that receives all incoming packets.
 func (c *Client) RegisterPacketHandler(handler PacketHandler) {
 	c.handlers = append(c.handlers, handler)
@@ -123,7 +117,7 @@ func (c *Client) SessionId() int32 {
 }
 
 func (c *Client) Connected() bool {
-	return c.isConnected
+	return (c.conn != nil)
 }
 
 // Connects to a random server of the Steam network and returns the server.
@@ -137,38 +131,45 @@ func (c *Client) Connect() string {
 // Connects to a specific server.
 // If this client is already connected, it is disconnected first.
 func (c *Client) ConnectTo(address string) {
-	log.Println("Connecting to", address)
+	c.connMutex.Lock()
+	defer c.connMutex.Unlock()
 
-	c.Disconnect()
+	if c.conn != nil {
+		c.Infof("won't connect to %s (already connected to %s)", address, c.address)
+		return
+	}
+
+	c.Infof("connecting to %s...", address)
 
 	conn, err := dialTCP(address)
 	if err != nil {
-		log.Fatal(err)
+		c.Fatalf("dial error: %v (transient)", err)
+		return
 	}
+
 	c.address = address
-	c.withConn(func() { c.conn = conn })
+	c.conn = conn
 	c.writeChan = make(chan IMsg, 5)
-	c.writeBuf = new(bytes.Buffer)
 
 	go c.readLoop()
 	go c.writeLoop()
 
-	c.isConnected = true
-
-	log.Println("Connected to", address)
+	c.Infof("connected to %s", address)
 }
 
 func (c *Client) Disconnect() {
-	c.withConn(func() {
-		if c.conn == nil {
-			return
-		}
-		log.Println("Disconnecting from", c.address)
-		c.stopHeartbeatLoop()
-		c.conn.Close()
-		c.conn = nil
-		c.isConnected = false
-	})
+	c.connMutex.Lock()
+	defer c.connMutex.Unlock()
+
+	if c.conn == nil {
+		return
+	}
+
+	c.Infof("disconnecting from %s...", c.address)
+	c.stopHeartbeatLoop()
+	c.conn.Close()
+	c.conn = nil
+	c.Infof("disconnected from %s.", c.address)
 }
 
 // Adds a message to the send queue. Modifications to the given message after
@@ -188,43 +189,44 @@ func (c *Client) readLoop() {
 	var err error
 
 	for {
-		c.withConn(func() {
-			packet, err = c.conn.Read()
-		})
-		if err == nil {
-			if packet == nil {
-				<-time.After(500 * time.Millisecond)
-			} else {
-				c.handlePacket(packet)
-			}
-		} else {
-			c.Fatalf("Error reading from the connection: %v", err)
+		if c.conn == nil {
+			c.Infof("read loop stopping (connection closed)")
 			return
+		}
+
+		if packet, err = c.conn.Read(); err != nil {
+			c.Fatalf("read error: %s (transient)", err)
+			return
+		}
+
+		if packet == nil {
+			c.Infof("got nil packet")
+			<-time.After(500 * time.Millisecond)
+		} else {
+			c.handlePacket(packet)
 		}
 	}
 }
 
 func (c *Client) writeLoop() {
-	for msg := range c.writeChan {
-		if !c.isConnected {
-			continue
-		}
+	var err error
+	var buf *bytes.Buffer = new(bytes.Buffer)
 
-		err := msg.Serialize(c.writeBuf)
-		if err != nil {
-			c.writeBuf.Reset()
-			c.Errorf("Error serializing message %v: %v", msg, err)
+	for msg := range c.writeChan {
+		buf.Reset()
+
+		if err = msg.Serialize(buf); err != nil {
+			c.Errorf("error serializing message %v: %s", msg, err)
 			return
 		}
 
-		c.withConn(func() {
-			err = c.conn.Write(c.writeBuf.Bytes())
-		})
+		if c.conn == nil {
+			c.Infof("write loop stopping (connection closed)")
+			return
+		}
 
-		c.writeBuf.Reset()
-
-		if err != nil {
-			c.Errorf("Error writing message %v: %v", msg, err)
+		if err = c.conn.Write(buf.Bytes()); err != nil {
+			c.Fatalf("write error: %s (transient)", err)
 			return
 		}
 	}
@@ -272,7 +274,7 @@ func (c *Client) handleChannelEncryptRequest(packet *PacketMsg) {
 	packet.ReadMsg(body)
 
 	if body.Universe != EUniverse_Public {
-		c.Fatalf("Invalid univserse %v!", body.Universe)
+		c.Fatalf("invalid universe %v!", body.Universe)
 	}
 
 	c.tempSessionKey = make([]byte, 32)
@@ -297,12 +299,14 @@ func (c *Client) handleChannelEncryptResult(packet *PacketMsg) {
 	packet.ReadMsg(body)
 
 	if body.Result != EResult_OK {
-		c.Fatalf("Encryption failed: %v", body.Result)
+		c.Fatalf("encryption error: %v", body.Result)
 		return
 	}
-	c.withConn(func() {
+
+	if c.conn != nil {
 		c.conn.SetEncryptionKey(c.tempSessionKey)
-	})
+	}
+
 	c.tempSessionKey = nil
 
 	c.Emit(new(ConnectedEvent))
@@ -328,7 +332,7 @@ func (c *Client) handleMulti(packet *PacketMsg) {
 			}
 		}
 
-		c.Errorf("Invalid Multi packet %v: Could not find 'z' file!", packet)
+		c.Errorf("invalid multi packet %v: could not find 'z' file!", packet)
 		return
 
 	okay: // jump over error
@@ -342,7 +346,7 @@ func (c *Client) handleMulti(packet *PacketMsg) {
 		pr.Read(packetData)
 		p, err := NewPacketMsg(packetData)
 		if err != nil {
-			c.Errorf("Error reading packet in Multi msg %v: %v", packet, err)
+			c.Errorf("error reading packet in multi msg %v: %v", packet, err)
 			continue
 		}
 		c.handlePacket(p)
@@ -353,5 +357,5 @@ func (c *Client) clientLoggedOff(packet *PacketMsg) {
 	msg := &CMsgClientLoggedOff{}
 	packet.ReadProtoMsg(msg)
 
-	c.Errorf("Client Logged Off: %s", EResult(msg.GetEresult()).String())
+	c.Errorf("client logged off: %s", EResult(msg.GetEresult()).String())
 }
