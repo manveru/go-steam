@@ -85,8 +85,8 @@ type FatalError error
 
 // Emits a FatalError formatted with fmt.Errorf and disconnects.
 func (c *Client) Fatalf(format string, a ...interface{}) {
-	defer c.Disconnect()
 	c.Emit(FatalError(fmt.Errorf(format, a...)))
+	c.Disconnect()
 }
 
 // Emits an error formatted with fmt.Errorf.
@@ -132,10 +132,10 @@ func (c *Client) Connect() string {
 // If this client is already connected, it is disconnected first.
 func (c *Client) ConnectTo(address string) {
 	c.connMutex.Lock()
-	defer c.connMutex.Unlock()
 
 	if c.conn != nil {
 		c.Infof("won't connect to %s (already connected to %s)", address, c.address)
+		c.connMutex.Unlock()
 		return
 	}
 
@@ -143,6 +143,7 @@ func (c *Client) ConnectTo(address string) {
 
 	conn, err := dialTCP(address)
 	if err != nil {
+		c.connMutex.Unlock()
 		c.Fatalf("dial error: %v (transient)", err)
 		return
 	}
@@ -155,6 +156,7 @@ func (c *Client) ConnectTo(address string) {
 	go c.writeLoop()
 
 	c.Infof("connected to %s", address)
+	c.connMutex.Unlock()
 }
 
 func (c *Client) Disconnect() {
@@ -195,7 +197,9 @@ func (c *Client) readLoop() {
 		}
 
 		if packet, err = c.conn.Read(); err != nil {
-			c.Fatalf("read error: %s (transient)", err)
+			if c.conn != nil {
+				c.Fatalf("read error: %s (transient)", err)
+			}
 			return
 		}
 
@@ -226,7 +230,9 @@ func (c *Client) writeLoop() {
 		}
 
 		if err = c.conn.Write(buf.Bytes()); err != nil {
-			c.Fatalf("write error: %s (transient)", err)
+			if c.conn != nil {
+				c.Fatalf("write error: %s (transient)", err)
+			}
 			return
 		}
 	}
